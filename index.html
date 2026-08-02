@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ToVaTo - 3D-Druck, Lasergravur und Plotter-Services. Wir bringen Ihre Ideen zum Leben.">
+<title>ToVaTo - Bald verfügbar</title>
+<style>
+  :root{
+    --cream:#FAF6F0;
+    --mint:#E8F5E9;
+    --sage:#A5D6A7;
+    --leaf:#81C784;
+    --ink:#4A5546;
+    --muted:#7A8577;
+    --line:#E8E4DB;
+    --amber:#E0A45C;
+    --teal:#5CA9A0;
+    --glow: rgba(129,199,132,.35);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html,body{height:100%;}
+
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.6;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---------- Ambient background ---------- */
+  #bg-canvas{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    width:100%;
+    height:100%;
+  }
+
+  .blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:.45;
+    z-index:-1;
+    pointer-events:none;
+    will-change:transform;
+  }
+  .blob-a{
+    width:38vmax;height:38vmax;
+    top:-12vmax;left:-10vmax;
+    background:radial-gradient(circle at 30% 30%, var(--sage), transparent 70%);
+    animation:drift1 22s ease-in-out infinite;
+  }
+  .blob-b{
+    width:32vmax;height:32vmax;
+    bottom:-14vmax;right:-8vmax;
+    background:radial-gradient(circle at 60% 60%, var(--leaf), transparent 70%);
+    animation:drift2 26s ease-in-out infinite;
+  }
+  .blob-c{
+    width:22vmax;height:22vmax;
+    bottom:10vh;left:8vw;
+    background:radial-gradient(circle, var(--amber), transparent 70%);
+    opacity:.18;
+    animation:drift3 30s ease-in-out infinite;
+  }
+
+  @keyframes drift1{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(6vmax,4vmax) scale(1.12);}
+  }
+  @keyframes drift2{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(-5vmax,-6vmax) scale(1.08);}
+  }
+  @keyframes drift3{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(4vmax,-3vmax) scale(1.15);}
+  }
+
+  /* ---------- Custom cursor ---------- */
+  @media (hover:hover) and (pointer:fine){
+    body{cursor:none;}
+    a,button,.copy-btn{cursor:none;}
+  }
+
+  .cursor-dot,.cursor-ring{
+    position:fixed;
+    top:0;left:0;
+    pointer-events:none;
+    z-index:9999;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    will-change:transform;
+  }
+  .cursor-dot{
+    width:7px;height:7px;
+    background:var(--leaf);
+    box-shadow:0 0 10px 2px var(--glow);
+  }
+  .cursor-ring{
+    width:34px;height:34px;
+    border:1.5px solid rgba(74,85,70,.35);
+    transition:width .25s ease,height .25s ease,border-color .25s ease,background .25s ease,opacity .2s ease;
+  }
+  .cursor-ring.hover{
+    width:56px;height:56px;
+    border-color:var(--leaf);
+    background:rgba(129,199,132,.12);
+  }
+  .cursor-ring.click{transform:translate(-50%,-50%) scale(.85);}
+
+  /* ---------- Layout ---------- */
+  .container{
+    text-align:center;
+    padding:2rem;
+    max-width:800px;
+    position:relative;
+    z-index:1;
+  }
+
+  .brand{
+    margin-bottom:1.75rem;
+  }
+
+  .logo{
+    font-size:4rem;
+    font-weight:700;
+    letter-spacing:.1em;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    perspective:600px;
+  }
+  .logo span{
+    display:inline-block;
+    opacity:0;
+    transform:translateY(35px) rotateX(-60deg);
+    animation:letterIn .7s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes letterIn{
+    to{opacity:1;transform:translateY(0) rotateX(0);}
+  }
+
+  .logo-underline{
+    height:3px;
+    width:0;
+    margin:.6rem auto 0;
+    background:linear-gradient(90deg,transparent,var(--leaf),transparent);
+    animation:underlineGrow 1.4s .9s ease-out forwards;
+    box-shadow:0 0 12px var(--glow);
+  }
+  @keyframes underlineGrow{
+    to{width:220px;}
+  }
+
+  .services{
+    margin-top:1.4rem;
+    display:flex;
+    justify-content:center;
+    gap:2.2rem;
+    flex-wrap:wrap;
+    opacity:0;
+    animation:fadeUp .8s 1.3s ease-out forwards;
+  }
+  .service{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:.4rem;
+    color:var(--muted);
+    font-weight:600;
+    font-size:.85rem;
+    letter-spacing:.03em;
+  }
+  .service svg{
+    width:30px;height:30px;
+    stroke:var(--leaf);
+    fill:none;
+    stroke-width:1.6;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .service.s2 svg{stroke:var(--amber);}
+  .service.s3 svg{stroke:var(--teal);}
+
+  .service .draw path,
+  .service .draw circle,
+  .service .draw line,
+  .service .draw polyline{
+    stroke-dasharray:60;
+    stroke-dashoffset:60;
+    animation:draw 2.4s ease-in-out infinite;
+  }
+  .service.s1 .draw *{animation-delay:.2s;}
+  .service.s2 .draw *{animation-delay:1s;}
+  .service.s3 .draw *{animation-delay:1.8s;}
+  @keyframes draw{
+    0%{stroke-dashoffset:60;}
+    35%,55%{stroke-dashoffset:0;}
+    90%,100%{stroke-dashoffset:-60;}
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(14px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ---------- Card ---------- */
+  .content{
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(165,214,167,.6);
+    border-radius:18px;
+    padding:3rem 2rem;
+    margin:2.4rem 0;
+    box-shadow:0 12px 40px rgba(129,199,132,.18), 0 2px 8px rgba(74,85,70,.06);
+    opacity:0;
+    animation:fadeUp .9s 1.5s ease-out forwards;
+    transform-style:preserve-3d;
+    transition:transform .15s ease-out;
+    position:relative;
+    overflow:hidden;
+  }
+  .content::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.55) 45%,transparent 60%);
+    background-size:220% 220%;
+    background-position:260% 0;
+    pointer-events:none;
+    animation:sheen 6s ease-in-out 2.2s infinite;
+  }
+  @keyframes sheen{
+    0%,60%,100%{background-position:260% 0;}
+    80%{background-position:-120% 0;}
+  }
+  .content > *{
+    position:relative;
+    z-index:1;
+  }
+
+  h1{
+    font-size:2.5rem;
+    color:var(--ink);
+    margin-bottom:1.75rem;
+    font-weight:600;
+  }
+
+  /* ---------- Build loader ---------- */
+  .build-loader{
+    position:relative;
+    width:84px;
+    height:84px;
+    margin:0 auto 2rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .build-loader svg{width:84px;height:84px;transform:rotate(-90deg);}
+  .build-loader .track{
+    fill:none;
+    stroke:var(--line);
+    stroke-width:5;
+  }
+  .build-loader .fill{
+    fill:none;
+    stroke:url(#loaderGradient);
+    stroke-width:5;
+    stroke-linecap:round;
+    stroke-dasharray:238;
+    stroke-dashoffset:238;
+    animation:buildProgress 2.6s cubic-bezier(.65,0,.35,1) infinite;
+  }
+  .build-loader .pct{
+    position:absolute;
+    font-size:.95rem;
+    font-weight:700;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  @keyframes buildProgress{
+    0%{stroke-dashoffset:238;}
+    85%,100%{stroke-dashoffset:0;}
+  }
+
+  .message{
+    font-size:1.125rem;
+    color:var(--muted);
+    margin-bottom:2rem;
+    line-height:1.8;
+  }
+
+  .contact{
+    margin-top:2.5rem;
+    padding-top:2rem;
+    border-top:1px solid var(--line);
+  }
+
+  .contact-title{
+    font-size:1.25rem;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:1rem;
+  }
+
+  .contact-info{
+    font-size:1rem;
+    color:var(--muted);
+  }
+
+  .mail-row{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    margin-top:.4rem;
+    position:relative;
+  }
+
+  .contact-info a{
+    color:var(--leaf);
+    text-decoration:none;
+    font-weight:500;
+    position:relative;
+  }
+  .contact-info a::after{
+    content:'';
+    position:absolute;
+    left:0;bottom:-2px;
+    width:100%;height:1.5px;
+    background:var(--ink);
+    transform:scaleX(0);
+    transform-origin:right;
+    transition:transform .3s ease;
+  }
+  .contact-info a:hover{color:var(--ink);}
+  .contact-info a:hover::after{transform:scaleX(1);transform-origin:left;}
+
+  .copy-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:8px;
+    width:30px;height:30px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--muted);
+    transition:transform .18s ease,border-color .18s ease,color .18s ease;
+  }
+  .copy-btn:hover{border-color:var(--leaf);color:var(--leaf);transform:translateY(-2px);}
+  .copy-btn svg{width:15px;height:15px;}
+  .copy-toast{
+    position:absolute;
+    top:-1.8rem;
+    left:50%;
+    transform:translateX(-50%) translateY(4px);
+    background:var(--ink);
+    color:var(--cream);
+    font-size:.72rem;
+    padding:.25rem .6rem;
+    border-radius:6px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease,transform .2s ease;
+    white-space:nowrap;
+  }
+  .copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .footer{
+    margin-top:2rem;
+    font-size:.875rem;
+    color:var(--muted);
+    opacity:0;
+    animation:fadeUp .8s 1.9s ease-out forwards;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5rem;
+  }
+  .footer .dot{
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--leaf);
+    box-shadow:0 0 8px var(--glow);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:.4;transform:scale(.8);}
+    50%{opacity:1;transform:scale(1.15);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+    .logo span{opacity:1;transform:none;}
+  }
+
+  @media (max-width:768px){
+    .logo{font-size:3rem;}
+    h1{font-size:2rem;}
+    .content{padding:2.25rem 1.5rem;}
+    .services{gap:1.4rem;}
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <div class="container">
+    <div class="brand">
+      <div class="logo" id="logo" aria-label="ToVaTo"></div>
+      <div class="logo-underline"></div>
+
+      <div class="services">
+        <div class="service s1">
+          <svg class="draw" viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
+          3D-Druck
+        </div>
+        <div class="service s2">
+          <svg class="draw" viewBox="0 0 24 24"><line x1="4" y1="20" x2="14" y2="10"/><path d="M14 10l3-3 3 3-3 3z"/><circle cx="6" cy="18" r="2"/></svg>
+          Lasergravur
+        </div>
+        <div class="service s3">
+          <svg class="draw" viewBox="0 0 24 24"><path d="M4 20 18 6"/><path d="M14 4l6 6"/><circle cx="6" cy="18" r="2"/></svg>
+          Plotter
+        </div>
+      </div>
+    </div>
+
+    <div class="content" id="tiltCard">
+      <h1>Wir bauen für Sie!</h1>
+
+      <div class="build-loader">
+        <svg viewBox="0 0 84 84">
+          <defs>
+            <linearGradient id="loaderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#A5D6A7"/>
+              <stop offset="100%" stop-color="#81C784"/>
+            </linearGradient>
+          </defs>
+          <circle class="track" cx="42" cy="42" r="38"/>
+          <circle class="fill" cx="42" cy="42" r="38"/>
+        </svg>
+        <span class="pct" id="pct">0%</span>
+      </div>
+
+      <p class="message">
+        Unser Online-Shop befindet sich derzeit im Aufbau.<br>
+        Bald können Sie hier Ihre individuellen Produkte bestellen.<br>
+        Vielen Dank für Ihre Geduld!
+      </p>
+
+      <div class="contact">
+        <div class="contact-title">Haben Sie Fragen?</div>
+        <div class="contact-info">
+          Kontaktieren Sie uns gerne:<br>
+          <div class="mail-row">
+            <a href="mailto:info@tovato-shop.de" id="mailLink">info@tovato-shop.de</a>
+            <button class="copy-btn" id="copyBtn" type="button" aria-label="E-Mail kopieren">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+            <span class="copy-toast" id="copyToast">Kopiert!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="dot"></span>
+      © 2026 ToVaTo - Wir bringen Ihre Ideen zum Leben
+    </div>
+  </div>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Animated percentage readout synced loosely with the ring loader */
+  var pctEl = document.getElementById('pct');
+  if(pctEl && !reduceMotion){
+    var start = performance.now();
+    (function tick(now){
+      var t = ((now - start) % 2600) / 2600;
+      var eased = t < .85 ? (t/.85) : 1;
+      pctEl.textContent = Math.round(eased*100) + '%';
+      requestAnimationFrame(tick);
+    })(start);
+  } else if(pctEl){
+    pctEl.textContent = '100%';
+  }
+
+  /* Letter-by-letter logo reveal */
+  var logo = document.getElementById('logo');
+  var word = 'ToVaTo';
+  word.split('').forEach(function(ch, i){
+    var s = document.createElement('span');
+    s.textContent = ch;
+    s.style.animationDelay = (i*0.08) + 's';
+    logo.appendChild(s);
+  });
+
+  /* Custom cursor */
+  var isFinePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if(isFinePointer){
+    var dot = document.getElementById('cursorDot');
+    var ring = document.getElementById('cursorRing');
+    var mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+
+    window.addEventListener('mousemove', function(e){
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+    });
+    window.addEventListener('mousedown', function(){ring.classList.add('click');});
+    window.addEventListener('mouseup', function(){ring.classList.remove('click');});
+
+    (function loop(){
+      rx += (mx-rx)*0.18;
+      ry += (my-ry)*0.18;
+      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+      requestAnimationFrame(loop);
+    })();
+
+    document.querySelectorAll('a, button').forEach(function(el){
+      el.addEventListener('mouseenter', function(){ring.classList.add('hover');});
+      el.addEventListener('mouseleave', function(){ring.classList.remove('hover');});
+    });
+  } else {
+    document.getElementById('cursorDot').style.display='none';
+    document.getElementById('cursorRing').style.display='none';
+  }
+
+  /* Card tilt / parallax */
+  var card = document.getElementById('tiltCard');
+  if(isFinePointer && !reduceMotion){
+    document.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      var cx = r.left + r.width/2, cy = r.top + r.height/2;
+      var dx = (e.clientX - cx) / (r.width/2);
+      var dy = (e.clientY - cy) / (r.height/2);
+      var dist = Math.hypot(e.clientX-cx, e.clientY-cy);
+      if(dist < Math.max(r.width, r.height)){
+        card.style.transform = 'rotateY(' + (dx*4) + 'deg) rotateX(' + (-dy*4) + 'deg)';
+      } else {
+        card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+      }
+    });
+  }
+
+  /* Copy email to clipboard */
+  var copyBtn = document.getElementById('copyBtn');
+  var toast = document.getElementById('copyToast');
+  copyBtn.addEventListener('click', function(){
+    var email = 'info@tovato-shop.de';
+    var done = function(){
+      toast.classList.add('show');
+      setTimeout(function(){toast.classList.remove('show');}, 1400);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(email).then(done).catch(done);
+    } else {
+      done();
+    }
+  });
+
+  /* Ambient particle network background */
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var w, h, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var nodes = [];
+
+  function resize(){
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = w*dpr; canvas.height = h*dpr;
+    canvas.style.width = w+'px'; canvas.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    var count = Math.min(70, Math.max(28, Math.round((w*h)/26000)));
+    nodes = [];
+    for(var i=0;i<count;i++){
+      nodes.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        vx: (Math.random()-0.5)*0.35,
+        vy: (Math.random()-0.5)*0.35
+      });
+    }
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var linkDist = 130;
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(var i=0;i<nodes.length;i++){
+      var n = nodes[i];
+      n.x += n.vx; n.y += n.vy;
+      if(n.x<0||n.x>w) n.vx*=-1;
+      if(n.y<0||n.y>h) n.vy*=-1;
+    }
+    for(var i=0;i<nodes.length;i++){
+      for(var j=i+1;j<nodes.length;j++){
+        var a=nodes[i], b=nodes[j];
+        var dx=a.x-b.x, dy=a.y-b.y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<linkDist){
+          ctx.strokeStyle = 'rgba(129,199,132,' + (0.16*(1-d/linkDist)) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.stroke();
+        }
+      }
+    }
+    for(var i=0;i<nodes.length;i++){
+      ctx.beginPath();
+      ctx.arc(nodes[i].x, nodes[i].y, 1.6, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(74,85,70,0.28)';
+      ctx.fill();
+    }
+    if(!reduceMotion) requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
