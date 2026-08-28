@@ -40,3 +40,34 @@ if ('IntersectionObserver' in window && revealEls.length) {
 } else {
   revealEls.forEach((el) => el.classList.add('is-visible'));
 }
+
+// Gallery carousel
+const galleryTrack = document.getElementById('gallery-track');
+const carouselPrev = document.querySelector('.carousel-btn-prev');
+const carouselNext = document.querySelector('.carousel-btn-next');
+
+if (galleryTrack) {
+  const scrollByAmount = () => {
+    const item = galleryTrack.querySelector('.carousel-item');
+    return item ? item.getBoundingClientRect().width + 20 : galleryTrack.clientWidth * 0.8;
+  };
+
+  carouselPrev?.addEventListener('click', () => {
+    galleryTrack.scrollBy({ left: -scrollByAmount(), behavior: 'smooth' });
+  });
+
+  carouselNext?.addEventListener('click', () => {
+    galleryTrack.scrollBy({ left: scrollByAmount(), behavior: 'smooth' });
+  });
+
+  // Allow vertical mouse-wheel scrolling to move the carousel horizontally
+  galleryTrack.addEventListener(
+    'wheel',
+    (event) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      event.preventDefault();
+      galleryTrack.scrollBy({ left: event.deltaY });
+    },
+    { passive: false }
+  );
+}
