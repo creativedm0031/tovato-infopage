@@ -149,28 +149,36 @@
           </p>
         </div>
 
-        <div class="gallery-grid">
-          <div class="gallery-item reveal">
-            <img src="assets/img/tovato-glas.png" alt="Personalisiertes Kerzenglas mit Gravur 'Weihnachtsgrüße'" loading="lazy" />
+        <div class="carousel reveal">
+          <button class="carousel-btn carousel-btn-prev" type="button" aria-label="Vorheriges Bild">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <div class="carousel-track" id="gallery-track" tabindex="0" role="region" aria-label="Bildergalerie, horizontal scrollbar">
+            <div class="carousel-item">
+              <img src="assets/img/tovato-geschenkbox-kerzen.png" alt="Personalisierte Geschenkboxen mit Kerze, Wunschzettel und Glasfläschchen zu Geburtstag und Hochzeit" loading="lazy" />
+            </div>
+            <div class="carousel-item">
+              <img src="assets/img/tovato-glasflasche-fuer-dich.png" alt="Glasfläschchen 'für Dich' in kleiner Holzhalterung" loading="lazy" />
+            </div>
+            <div class="carousel-item">
+              <img src="assets/img/tovato-kerzenhalter-geburtstag-muttertag.png" alt="Kerzenhalter mit personalisierten Kerzen zu Geburtstag und Muttertag" loading="lazy" />
+            </div>
+            <div class="carousel-item">
+              <img src="assets/img/tovato-tortenkerze-pustekuchen.png" alt="Kerze 'Herzlichen Glückwunsch' auf tortenförmigem Kerzenhalter 'Pustekuchen'" loading="lazy" />
+            </div>
+            <div class="carousel-item">
+              <img src="assets/img/tovato-gartenstecker-blumen.png" alt="Gartenstecker aus Metall mit Blumen-, Schmetterlings- und Brautpaar-Motiven" loading="lazy" />
+            </div>
           </div>
-          <div class="gallery-item reveal">
-            <img src="assets/img/tovato-2kerzen.png" alt="Personalisierte Stabkerzen mit Handschrift-Druck" loading="lazy" />
-          </div>
-          <div class="gallery-item reveal">
-            <img src="assets/img/tovato-3kerzen.png" alt="Kerzenhalter mit Smiley-Motiv und individuellen Kerzen" loading="lazy" />
-          </div>
-          <div class="gallery-item reveal">
-            <img src="assets/img/tovato-fisch.png" alt="Kommunion-Set mit graviertem Fisch-Motiv" loading="lazy" />
-          </div>
-          <div class="gallery-item reveal">
-            <img src="assets/img/service-3ddruck.png" alt="3D-gedruckte Blumenstecker als Tischdeko" loading="lazy" />
-          </div>
-          <div class="gallery-item reveal">
-            <img src="assets/img/service-lasern.png" alt="Lasergravur auf Holz: 'Du bist mir wichtelig'" loading="lazy" />
-          </div>
-          <div class="gallery-item reveal">
-            <img src="assets/img/service-plotten.png" alt="Geplottete Beschriftung auf einem Keramik-Kerzenhalter" loading="lazy" />
-          </div>
+
+          <button class="carousel-btn carousel-btn-next" type="button" aria-label="Nächstes Bild">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
         </div>
       </div>
     </section>
