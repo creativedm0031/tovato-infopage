@@ -41,33 +41,32 @@ if ('IntersectionObserver' in window && revealEls.length) {
   revealEls.forEach((el) => el.classList.add('is-visible'));
 }
 
-// Gallery carousel
-const galleryTrack = document.getElementById('gallery-track');
-const carouselPrev = document.querySelector('.carousel-btn-prev');
-const carouselNext = document.querySelector('.carousel-btn-next');
+// Gallery carousels
+document.querySelectorAll('.carousel').forEach((carousel) => {
+  const track = carousel.querySelector('.carousel-track');
+  if (!track) return;
 
-if (galleryTrack) {
   const scrollByAmount = () => {
-    const item = galleryTrack.querySelector('.carousel-item');
-    return item ? item.getBoundingClientRect().width + 20 : galleryTrack.clientWidth * 0.8;
+    const item = track.querySelector('.carousel-item');
+    return item ? item.getBoundingClientRect().width + 20 : track.clientWidth * 0.8;
   };
 
-  carouselPrev?.addEventListener('click', () => {
-    galleryTrack.scrollBy({ left: -scrollByAmount(), behavior: 'smooth' });
+  carousel.querySelector('.carousel-btn-prev')?.addEventListener('click', () => {
+    track.scrollBy({ left: -scrollByAmount(), behavior: 'smooth' });
   });
 
-  carouselNext?.addEventListener('click', () => {
-    galleryTrack.scrollBy({ left: scrollByAmount(), behavior: 'smooth' });
+  carousel.querySelector('.carousel-btn-next')?.addEventListener('click', () => {
+    track.scrollBy({ left: scrollByAmount(), behavior: 'smooth' });
   });
 
   // Allow vertical mouse-wheel scrolling to move the carousel horizontally
-  galleryTrack.addEventListener(
+  track.addEventListener(
     'wheel',
     (event) => {
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
       event.preventDefault();
-      galleryTrack.scrollBy({ left: event.deltaY });
+      track.scrollBy({ left: event.deltaY });
     },
     { passive: false }
   );
-}
+});
